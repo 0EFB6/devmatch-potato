@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import MintTokenModal from "./components/Mint-token";
 import TransferTokenModal from "./components/Transfer-token";
 import GetInfoModal from "./components/Get-Info";
+import GetCertificateListModal from "./components/Get-certificate-list";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,6 +14,7 @@ export default function Home() {
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isGetCertificateListModalOpen, setIsGetCertificateListModalOpen] = useState(false);
 
   const openMintModal = () => {
     setIsMintModalOpen(true);
@@ -36,6 +38,14 @@ export default function Home() {
 
   const closeInfoModal = () => {
     setIsInfoModalOpen(false);
+  }
+
+  const openGetCertificateListModal = () => {
+    setIsGetCertificateListModalOpen(true);
+  }
+
+  const closeGetCertificateListModal = () => {
+    setIsGetCertificateListModalOpen(false);
   }
 
   useEffect(() => {
@@ -231,6 +241,63 @@ export default function Home() {
     }
   }
 
+  const handleGetCertificateListSubmit = async (data) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/get-smart-contract`,
+        {
+          method: "GET",
+          headers: {
+            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to get token transactions");
+      }
+
+      const result = await response.json();
+      console.log("Certificate List:", result);
+
+      if (!walletAddress) {
+        throw new Error("Wallet address not found in the response");
+      }
+
+      toast.success(
+        `🦄 Get Certifiacte List successfully!
+        Wallet address: ${walletAddress}`,
+        {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      closeGetCertificateListModal();
+    } catch (error) {
+      console.error("Error getting certificate list:", error);
+      toast.error("🦄 Error getting certificate list", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // Don't send the request if there's an error
+      return;
+    }
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center ">
       <h1 className="font-bold text-2xl uppercase text-center">
@@ -268,6 +335,13 @@ export default function Home() {
                 className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
               >
                 Get Account Balance Info
+              </button>
+
+              <button
+                onClick={openGetCertificateListModal}
+                className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+              >
+                Get certificate list
               </button>
             </div>
           </>
@@ -316,6 +390,21 @@ export default function Home() {
             <GetInfoModal
               onSubmit={handleGetInfoSubmit}
               onClose={closeInfoModal}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isGetCertificateListModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+          >
+            <GetCertificateListModal
+              onSubmit={handleGetCertificateListSubmit}
+              onClose={closeGetCertificateListModal}
             />
           </motion.div>
         )}
