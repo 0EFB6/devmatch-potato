@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import MintTokenModal from "./components/Mint-token";
 import TransferTokenModal from "./components/Transfer-token";
+import GetInfoModal from "./components/Get-Info";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,6 +12,7 @@ export default function Home() {
 
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   const openMintModal = () => {
     setIsMintModalOpen(true);
@@ -27,6 +29,14 @@ export default function Home() {
   const closeTransferModal = () => {
     setIsTransferModalOpen(false);
   };
+
+  const openInfoModal = () => {
+    setIsInfoModalOpen(true);
+  };
+
+  const closeInfoModal = () => {
+    setIsInfoModalOpen(false);
+  }
 
   useEffect(() => {
     const storedWalletAddress = sessionStorage.getItem("walletAddress");
@@ -81,7 +91,7 @@ export default function Home() {
           theme: "light",
         }
       );
-      closeModal();
+      closeMintModal();
     } catch (error) {
       console.error("Error minting token:", error);
       toast.error("🦄 Error minting token", {
@@ -144,7 +154,7 @@ export default function Home() {
           theme: "light",
         }
       );
-      closeModal();
+      closeTransferModal();
     } catch (error) {
       console.error("Error transfering token:", error);
       toast.error("🦄 Error transfering token", {
@@ -161,6 +171,65 @@ export default function Home() {
       return;
     }
   };
+
+  const handleGetInfoSubmit = async (data) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/token/balance`,
+        {
+          method: "POST",
+          headers: {
+            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      console.log("Data:", data);
+      if (!response.ok) {
+        throw new Error("Failed to get token info");
+      }
+
+      const result = await response.json();
+      console.log("Token Info:", result);
+
+      if (!walletAddress) {
+        throw new Error("Wallet address not found in the response");
+      }
+
+      toast.success(
+        `🦄 Token info successfully!
+        Wallet address: ${walletAddress}`,
+        {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      closeInfoModal();
+    } catch (error) {
+      console.error("Error getting token info:", error);
+      toast.error("🦄 Error getting token info", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // Don't send the request if there's an error
+      return;
+    }
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center ">
@@ -192,6 +261,13 @@ export default function Home() {
                 className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
               >
                 Transfer Token
+              </button>
+
+              <button
+                onClick={openInfoModal}
+                className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+              >
+                Get Account Balance Info
               </button>
             </div>
           </>
@@ -225,6 +301,21 @@ export default function Home() {
             <TransferTokenModal
               onSubmit={handleTransferSubmit}
               onClose={closeTransferModal}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isInfoModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+          >
+            <GetInfoModal
+              onSubmit={handleGetInfoSubmit}
+              onClose={closeInfoModal}
             />
           </motion.div>
         )}
