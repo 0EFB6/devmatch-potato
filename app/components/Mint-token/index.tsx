@@ -2,15 +2,15 @@
 import React, { useState } from "react";
 
 const MintTokenModal = ({ onSubmit, onClose }) => {
-  const [walletAddress, setWalletAddress] = useState("");
+  const [wallet_address, setWalletAddress] = useState("");
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
-  const contractAddress = "0xC523A5A3E2A037c9c9fd81fB962db1f87A1ea4A3";
-  const fallbackUrl = "https://postman-echo.com/post?";
+  const contract_address = "0xAB64C671C89D60D56DdA039d9a27FdF3a1F94ec1";
+  const callback_url = "https://postman-echo.com/post?";
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ walletAddress, to, amount, contractAddress, fallbackUrl });
+    onSubmit({ wallet_address, to, amount, contract_address, callback_url });
   };
 
   return (
@@ -25,7 +25,7 @@ const MintTokenModal = ({ onSubmit, onClose }) => {
             <input
               type="text"
               id="walletAddress"
-              value={walletAddress}
+              value={wallet_address}
               onChange={(e) => setWalletAddress(e.target.value)}
               className="w-full px-3 py-2 border rounded-md"
               required
@@ -64,7 +64,7 @@ const MintTokenModal = ({ onSubmit, onClose }) => {
             <input
               type="text"
               id="contractAddress"
-              value={contractAddress}
+              value={contract_address}
               className="w-full px-3 py-2 border rounded-md"
               required
             />
@@ -76,7 +76,7 @@ const MintTokenModal = ({ onSubmit, onClose }) => {
             <input
               type="text"
               id="fallbackUrl"
-              value={fallbackUrl}
+              value={callback_url}
               className="w-full px-3 py-2 border rounded-md"
               required
             />
