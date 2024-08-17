@@ -48,8 +48,31 @@ export default function Home() {
     setIsGetCertificateListModalOpen(false);
   }
 
+  const getWalletAddressByIndex = (index) => {
+    // Retrieve and parse the wallet addresses from session storage
+    const storedAddresses = sessionStorage.getItem('walletAddresses');
+    if (storedAddresses) {
+      try {
+        const walletAddresses = JSON.parse(storedAddresses);
+  
+        // Check if index is within bounds
+        if (Array.isArray(walletAddresses) && index >= 0 && index < walletAddresses.length) {
+          return walletAddresses[index];
+        } else {
+          throw new Error('Index out of bounds or invalid data format');
+        }
+      } catch (error) {
+        console.error('Failed to parse wallet addresses:', error);
+        return null; // or handle it as needed
+      }
+    } else {
+      console.error('No wallet addresses found in session storage');
+      return null; // or handle it as needed
+    }
+  };
+
   useEffect(() => {
-    const storedWalletAddress = sessionStorage.getItem("walletAddress");
+    const storedWalletAddress = getWalletAddressByIndex(sessionStorage.getItem('currentWalletIndex'));
     if (storedWalletAddress) {
       setWalletAddress(storedWalletAddress);
     }
