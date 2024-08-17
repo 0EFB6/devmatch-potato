@@ -1,4 +1,5 @@
 "use client";
+"use client";
 import { useState, useEffect } from "react";
 import CreateWalletModal from "./components/Create-wallet";
 import MintTokenModal from "./components/Mint-token";
@@ -16,8 +17,9 @@ export default function Home() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isGetCertificateListModalOpen, setIsGetCertificateListModalOpen] = useState(false);
-  const [isCreateWalletModalOpen, setIsCreateWalletModalOpen] = useState(false);
 
+  const [isCreateWalletModalOpen, setIsCreateWalletModalOpen] = useState(false);
+  
   const openMintModal = () => {
     setIsMintModalOpen(true);
   };
@@ -80,50 +82,126 @@ export default function Home() {
       return null; // or handle it as needed
     }
   };
-
+  
   useEffect(() => {
-    const storedWalletAddress = getWalletAddressByIndex(sessionStorage.getItem('currentWalletIndex'));
+    const storedWalletAddress = sessionStorage.getItem("walletAddress");
     if (storedWalletAddress) {
       setWalletAddress(storedWalletAddress);
     }
   }, []);
 
-  const clearWalletAddress = () => {
-    sessionStorage.removeItem("walletAddress");
-    setWalletAddress(null);
-  };
-
-  //fix function here late
-  const handleMintSubmit = async (data) => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/token/mint`,
-        {
-          method: "POST",
-          headers: {
-            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+    const handleSubmit = async (data) => {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/create-user`,
+            {
+              method: "POST",
+              headers: {
+                client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+                client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            }
+          );
+    
+          if (!response.ok) {
+            throw new Error("Failed to create user");
+          }
+    
+          const result = await response.json();
+          //   console.log("User created:", result);
+          const walletAddress = result.result.wallet.wallet_address;
+          let walletAddresses = JSON.parse(sessionStorage.getItem("walletAddresses")) || [];
+          walletAddresses.push(walletAddress);
+          sessionStorage.setItem("walletAddresses", JSON.stringify(walletAddresses));
+          sessionStorage.setItem("currentWalletIndex", walletAddresses.length - 1);
+    
+          if (!walletAddress) {
+            throw new Error("Wallet address not found in the response");
+          }
+    
+          toast.success(
+            `🦄 User created successfully!
+            Wallet address: ${walletAddress}`,
+            {
+              position: "bottom-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            }
+          );
+          closeModal();
+        } catch (error) {
+          console.error("Error creating user:", error);
+          toast.error("🦄 Error creating user", {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          // Don't send the request if there's an error
+          return;
         }
-      );
+    };
 
-      if (!response.ok) {
-        throw new Error("Failed to mint token");
-      }
-
-      const result = await response.json();
-      console.log("Token Minted:", result);
-
-      if (!walletAddress) {
-        throw new Error("Wallet address not found in the response");
-      }
-
-      toast.success(
-        `🦄 Minted token successfully!
-        Wallet address: ${walletAddress}`,
-        {
+    const handleCreateWallet = async (data) => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/create-user`,
+          {
+            method: "POST",
+            headers: {
+              client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+              client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to create user");
+        }
+  
+        const result = await response.json();
+        //   console.log("User created:", result);
+        const walletAddress = result.result.wallet.wallet_address;
+        let walletAddresses = JSON.parse(sessionStorage.getItem("walletAddresses")) || [];
+        walletAddresses.push(walletAddress);
+        sessionStorage.setItem("walletAddresses", JSON.stringify(walletAddresses));
+        sessionStorage.setItem("currentWalletIndex", walletAddresses.length - 1);
+  
+        if (!walletAddress) {
+          throw new Error("Wallet address not found in the response");
+        }
+  
+        toast.success(
+          `🦄 User created successfully!
+          Wallet address: ${walletAddress}`,
+          {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
+        );
+        closeModal();
+      } catch (error) {
+        console.error("Error creating user:", error);
+        toast.error("🦄 Error creating user", {
           position: "bottom-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -132,25 +210,11 @@ export default function Home() {
           draggable: true,
           progress: undefined,
           theme: "light",
-        }
-      );
-      closeMintModal();
-    } catch (error) {
-      console.error("Error minting token:", error);
-      toast.error("🦄 Error minting token", {
-        position: "bottom-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      // Don't send the request if there's an error
-      return;
-    }
-  };
+        });
+        // Don't send the request if there's an error
+        return;
+      }
+    };
 
   //fix function here late
   const handleTransferSubmit = async (data) => {
@@ -397,7 +461,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center ">
       <h1 className="font-bold text-2xl uppercase text-center">
-        Maschain API Workshop Demo
+        Allowance claim main
       </h1>
       <p className="text-sm text-gray-500 lowercase font-normal mt-4">
         {walletAddress ? (
@@ -449,9 +513,24 @@ export default function Home() {
             </div>
           </>
         ) : (
-          "Create Wallet to Get Started"
+          "Login or Create Wallet to Get Started"
         )}
       </p>
+      <AnimatePresence>
+        {isCreateWalletModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+          >
+            <CreateWalletModal
+              onSubmit={handleCreateWallet}
+              onClose={closeCreateWalletModal}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {isMintModalOpen && (
           <motion.div
