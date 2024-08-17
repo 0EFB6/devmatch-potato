@@ -118,7 +118,7 @@ const Header = () => {
         <div className="flex items-center">
           <h1 className="text-xl font-bold">Maschain Demo</h1>
         </div>
-        <button
+        {/* <button
           onClick={openModal}
           className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
         >
@@ -132,14 +132,14 @@ const Header = () => {
           ) : (
             "Create Wallet"
           )}
-        </button>
+        </button> */}
         <button
           onClick={openSwitchWalletModal}
           className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300">
           Switch Wallet
         </button>
       </div>
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {isModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -150,7 +150,7 @@ const Header = () => {
             <CreateWalletModal onSubmit={handleSubmit} onClose={closeModal} />
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
       <AnimatePresence>
         {isSwitchWalletModalOpen && (
           <motion.div
