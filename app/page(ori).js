@@ -1,21 +1,20 @@
+"use client";
 import { useState, useEffect } from "react";
 import MintTokenModal from "./components/Mint-token";
 import TransferTokenModal from "./components/Transfer-token";
 import GetInfoModal from "./components/Get-Info";
 import GetCertificateListModal from "./components/Get-certificate-list";
-import ApplicationModal from "./components/Application";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function Login() {
+export default function Home() {
   const [walletAddress, setWalletAddress] = useState(null);
 
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isGetCertificateListModalOpen, setIsGetCertificateListModalOpen] = useState(false);
-  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
 
   const openMintModal = () => {
     setIsMintModalOpen(true);
@@ -39,14 +38,6 @@ export default function Login() {
 
   const closeInfoModal = () => {
     setIsInfoModalOpen(false);
-  }
-
-  const openApplicationModal = () => {
-    setIsApplicationModalOpen(true);
-  }
-
-  const closeApplicationModal = () => {
-    setIsApplicationModalOpen(false);
   }
 
   const openGetCertificateListModal = () => {
@@ -80,75 +71,76 @@ export default function Login() {
     }
   };
 
-    useEffect(() => {
-        const storedWalletAddress = sessionStorage.getItem("walletAddress");
-        if (storedWalletAddress) {
-          setWalletAddress(storedWalletAddress);
-        }
-      }, []);
+  useEffect(() => {
+    const storedWalletAddress = getWalletAddressByIndex(sessionStorage.getItem('currentWalletIndex'));
+    if (storedWalletAddress) {
+      setWalletAddress(storedWalletAddress);
+    }
+  }, []);
 
-    const handleSubmit = async (data) => {
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/create-user`,
-            {
-              method: "POST",
-              headers: {
-                client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-                client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            }
-          );
-    
-          if (!response.ok) {
-            throw new Error("Failed to create user");
-          }
-    
-          const result = await response.json();
-          //   console.log("User created:", result);
-          const walletAddress = result.result.wallet.wallet_address;
-          let walletAddresses = JSON.parse(sessionStorage.getItem("walletAddresses")) || [];
-          walletAddresses.push(walletAddress);
-          sessionStorage.setItem("walletAddresses", JSON.stringify(walletAddresses));
-          sessionStorage.setItem("currentWalletIndex", walletAddresses.length - 1);
-    
-          if (!walletAddress) {
-            throw new Error("Wallet address not found in the response");
-          }
-    
-          toast.success(
-            `🦄 User created successfully!
-            Wallet address: ${walletAddress}`,
-            {
-              position: "bottom-center",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-            }
-          );
-          closeModal();
-        } catch (error) {
-          console.error("Error creating user:", error);
-          toast.error("🦄 Error creating user", {
-            position: "bottom-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          // Don't send the request if there's an error
-          return;
+  const clearWalletAddress = () => {
+    sessionStorage.removeItem("walletAddress");
+    setWalletAddress(null);
+  };
+
+  //fix function here late
+  const handleMintSubmit = async (data) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/token/mint`,
+        {
+          method: "POST",
+          headers: {
+            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         }
-    };
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to mint token");
+      }
+
+      const result = await response.json();
+      console.log("Token Minted:", result);
+
+      if (!walletAddress) {
+        throw new Error("Wallet address not found in the response");
+      }
+
+      toast.success(
+        `🦄 Minted token successfully!
+        Wallet address: ${walletAddress}`,
+        {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      closeMintModal();
+    } catch (error) {
+      console.error("Error minting token:", error);
+      toast.error("🦄 Error minting token", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // Don't send the request if there's an error
+      return;
+    }
+  };
 
   //fix function here late
   const handleTransferSubmit = async (data) => {
@@ -329,86 +321,30 @@ export default function Login() {
     }
   }
 
-  const handleApplicationSubmit = async (data) => {
-    try {
-      console.log("Data:", data);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/mint-certificate`,
-        {
-          method: "POST",
-          headers: {  
-            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-            // "Content-Type": "multipart/form-data",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to submit application");
-      }
-
-      const result = await response.json();
-      console.log("Result:", result);
-      // const walletAddress = result.result.wallet.wallet_address;
-      //   console.log("Wallet address:", walletAddress);
-      // Store the wallet address in sessionStorage
-      // sessionStorage.setItem("walletAddress", walletAddress);
-
-      // if (!walletAddress) {
-      //   throw new Error("Wallet address not found in the response");
-      // }
-
-      toast.success(
-        `🦄 Application submitted successfully!`,
-        {
-          position: "bottom-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-      closeApplicationModal();
-    } catch (error) {
-      console.error("Error submitting application:", error);
-      toast.error("🦄 Error submitting application", {
-        position: "bottom-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      // Don't send the request if there's an error
-      return;
-    }
-  }
-
-    return (
-        <main className="flex min-h-screen flex-col items-center justify-center ">
-          <h1 className="font-bold text-2xl uppercase text-center">
-            User login
-          </h1>
-          <p className="text-sm text-gray-500 lowercase font-normal mt-4">
-            {walletAddress ? (
-              <>
-                {`Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(
-                  -4
-                )}`}
-                <div className="flex flex-col items-center justify-center">
-                  <button
-                    onClick={openMintModal}
-                    className="mt-4 border w-full rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
-                  >
-                    Login
-                  </button>
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center ">
+      <h1 className="font-bold text-2xl uppercase text-center">
+        Maschain API Workshop Demo
+      </h1>
+      <p className="text-sm text-gray-500 lowercase font-normal mt-4">
+        {walletAddress ? (
+          <>
+            {`Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(
+              -4
+            )}`}
+            <div className="flex flex-col items-center justify-center">
+              <button
+                onClick={clearWalletAddress}
+                className="w-full mt-4 border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+              >
+                Disconnect Wallet
+              </button>
+              <button
+                onClick={openMintModal}
+                className="mt-4 border w-full rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+              >
+                Mint Token
+              </button>
 
               <button
                 onClick={openTransferModal}
@@ -429,13 +365,6 @@ export default function Login() {
                 className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
               >
                 Get certificate list
-              </button>
-
-              <button
-                onClick={openApplicationModal}
-                className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
-              >
-                Submit Application
               </button>
             </div>
           </>
@@ -499,21 +428,6 @@ export default function Login() {
             <GetCertificateListModal
               onSubmit={handleGetCertificateListSubmit}
               onClose={closeGetCertificateListModal}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {isApplicationModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
-          >
-            <ApplicationModal
-              onSubmit={handleApplicationSubmit}
-              onClose={closeApplicationModal}
             />
           </motion.div>
         )}
