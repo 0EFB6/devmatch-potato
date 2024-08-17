@@ -4,6 +4,7 @@ import MintTokenModal from "./components/Mint-token";
 import TransferTokenModal from "./components/Transfer-token";
 import GetInfoModal from "./components/Get-Info";
 import GetCertificateListModal from "./components/Get-certificate-list";
+import ApplicationModal from "./components/Application";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,6 +16,7 @@ export default function Home() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isGetCertificateListModalOpen, setIsGetCertificateListModalOpen] = useState(false);
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
 
   const openMintModal = () => {
     setIsMintModalOpen(true);
@@ -38,6 +40,14 @@ export default function Home() {
 
   const closeInfoModal = () => {
     setIsInfoModalOpen(false);
+  }
+
+  const openApplicationModal = () => {
+    setIsApplicationModalOpen(true);
+  }
+
+  const closeApplicationModal = () => {
+    setIsApplicationModalOpen(false);
   }
 
   const openGetCertificateListModal = () => {
@@ -321,6 +331,68 @@ export default function Home() {
     }
   }
 
+  const handleApplicationSubmit = async (data) => {
+    try {
+      console.log("Data:", data);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/mint-certificate`,
+        {
+          method: "POST",
+          headers: {  
+            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+            // "Content-Type": "multipart/form-data",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to submit application");
+      }
+
+      const result = await response.json();
+      console.log("Result:", result);
+      // const walletAddress = result.result.wallet.wallet_address;
+      //   console.log("Wallet address:", walletAddress);
+      // Store the wallet address in sessionStorage
+      // sessionStorage.setItem("walletAddress", walletAddress);
+
+      // if (!walletAddress) {
+      //   throw new Error("Wallet address not found in the response");
+      // }
+
+      toast.success(
+        `🦄 Application submitted successfully!`,
+        {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      closeApplicationModal();
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      toast.error("🦄 Error submitting application", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // Don't send the request if there's an error
+      return;
+    }
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center ">
       <h1 className="font-bold text-2xl uppercase text-center">
@@ -365,6 +437,13 @@ export default function Home() {
                 className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
               >
                 Get certificate list
+              </button>
+
+              <button
+                onClick={openApplicationModal}
+                className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+              >
+                Submit Application
               </button>
             </div>
           </>
@@ -428,6 +507,21 @@ export default function Home() {
             <GetCertificateListModal
               onSubmit={handleGetCertificateListSubmit}
               onClose={closeGetCertificateListModal}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isApplicationModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+          >
+            <ApplicationModal
+              onSubmit={handleApplicationSubmit}
+              onClose={closeApplicationModal}
             />
           </motion.div>
         )}
