@@ -1,4 +1,6 @@
+"use client";
 import { useState, useEffect } from "react";
+import CreateWalletModal from "./components/Create-wallet";
 import MintTokenModal from "./components/Mint-token";
 import TransferTokenModal from "./components/Transfer-token";
 import GetInfoModal from "./components/Get-Info";
@@ -16,6 +18,15 @@ export default function Login() {
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isGetCertificateListModalOpen, setIsGetCertificateListModalOpen] = useState(false);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+  const [isCreateWalletModalOpen, setIsCreateWalletModalOpen] = useState(false);
+
+  const openCreateWalletModal = () => {
+    setIsCreateWalletModalOpen(true);
+  };
+
+  const closeCreateWalletModal = () => {
+    setIsCreateWalletModalOpen(false);
+  };
 
   const openMintModal = () => {
     setIsMintModalOpen(true);
@@ -148,6 +159,69 @@ export default function Login() {
           // Don't send the request if there's an error
           return;
         }
+    };
+
+    const handleCreateWallet = async (data) => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/create-user`,
+          {
+            method: "POST",
+            headers: {
+              client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+              client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to create user");
+        }
+  
+        const result = await response.json();
+        //   console.log("User created:", result);
+        const walletAddress = result.result.wallet.wallet_address;
+        let walletAddresses = JSON.parse(sessionStorage.getItem("walletAddresses")) || [];
+        walletAddresses.push(walletAddress);
+        sessionStorage.setItem("walletAddresses", JSON.stringify(walletAddresses));
+        sessionStorage.setItem("currentWalletIndex", walletAddresses.length - 1);
+  
+        if (!walletAddress) {
+          throw new Error("Wallet address not found in the response");
+        }
+  
+        toast.success(
+          `🦄 User created successfully!
+          Wallet address: ${walletAddress}`,
+          {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
+        );
+        closeModal();
+      } catch (error) {
+        console.error("Error creating user:", error);
+        toast.error("🦄 Error creating user", {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        // Don't send the request if there's an error
+        return;
+      }
     };
 
   //fix function here late
@@ -437,12 +511,34 @@ export default function Login() {
               >
                 Submit Application
               </button>
+
+              <button
+                onClick={openCreateWalletModal}
+                className="mt-4 w-full border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+              >
+                Create Wallet
+              </button>
             </div>
           </>
         ) : (
           "Create Wallet to Get Started"
         )}
       </p>
+      <AnimatePresence>
+        {isCreateWalletModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+          >
+            <CreateWalletModal
+              onSubmit={handleCreateWallet}
+              onClose={closeCreateWalletModal}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {isMintModalOpen && (
           <motion.div
