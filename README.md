@@ -1,31 +1,39 @@
-# Next.js + Ethers.js starter template
+# This is the source code for JomClaim
 
-A boilerplate template for your Next.js and Ethers.js dapp.
+The purpose of this repsitory is the show the code for the JomClaim webpage that is deployed on Scroll Sepolia testnet.
 
-## Built with
+This project sets up the basic required functions for applying allowance such as:
 
-| Framework                                         | Description                                             |
-| ------------------------------------------------- | ------------------------------------------------------- |
-| [Ethers.js](https://www.npmjs.com/package/ethers) | A library for interacting with the Ethereum blockchain. |
-| [Next.js](https://www.npmjs.com/package/next)     | A framework for building fast and responsive web apps.  |
+1. Creating User Wallet
+2. Creating certification for allowance application
+
 
 ## Getting Started
 
-- Clone the repository
-- Install dependencies `npm install`
-- Run `npm run dev` to start the development server
-- Open the app in a browser
+First, install required files:
+```bash
+npm install
+# or
+yarn install
+```
 
-### Screenshots
+Then, run the development server:
 
-#### 🟢 Connected
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-<img src="screenshots/connected.png" alt="Connected to metamask" width="500">
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result
 
-#### Default status
+# Contact for problems
 
-<img src="screenshots/not-connected.png" alt="Default status" width="500">
-
-#### No Metamask
-
-<img src="screenshots/no-metamask.png" alt="User dont have metamask installed" width="500">
+```bash
+Contact the team if you have any questions
+@Gravityforce04 , @0EF86
+```
