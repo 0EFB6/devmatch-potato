@@ -12,6 +12,13 @@ This project sets up the basic required functions for applying allowance such as
 
 ## Getting Started
 
+First, install required files:
+```bash
+npm install
+# or
+yarn install
+```
+
 First, run the development server:
 
 ```bash
