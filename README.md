@@ -1,15 +1,14 @@
-# This is a project template for APUBCC Devmatch 2024 Hackathon
+# This is the source code for JomClaim
 
-The purpose of this template is to facilitate new developers to quickly get a hands-on approach and start developing using Maschain's API.  
-Test it out [HERE](https://maschainworkshop.vercel.app/)
+The purpose of this repsitory is the show the code for the JomClaim webpage that is deployed on MasChain using MasChain's API key. 
 
-This project sets up the basic functions such as:
+This project sets up the basic required functions for applying allowance such as:
 
 1. Creating User Wallet
-2. Minting Token
-3. Transferring Token
+2. Creating certification for allowance application
+3. Signing the certification
+4. Switch Wallet
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
@@ -29,13 +28,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Obtain Necessary Keys from Maschain
 
-Navigate to https://portal-testnet.maschain.com/ to get the necessary keys.
-
-In the .env.example file, replace the values with your own key, and rename the file to just ".env" or ".env.local"
-
-# Have fun building
+# Contact for problems
 
 ```bash
-Contact me or the team if you have any questions
-@OxBenjamintan - AKA LengzaiBen
+Contact the team if you have any questions
+@Gravityforce04 , @0EF86
 ```
