@@ -1,43 +1,31 @@
-# This is the source code for JomClaim
+# Next.js + Ethers.js starter template
 
-The purpose of this repsitory is the show the code for the JomClaim webpage that is deployed on MasChain using MasChain's API key. 
+A boilerplate template for your Next.js and Ethers.js dapp.
 
-This project sets up the basic required functions for applying allowance such as:
+## Built with
 
-1. Creating User Wallet
-2. Creating certification for allowance application
-3. Signing the certification
-4. Switch Wallet
-
+| Framework                                         | Description                                             |
+| ------------------------------------------------- | ------------------------------------------------------- |
+| [Ethers.js](https://www.npmjs.com/package/ethers) | A library for interacting with the Ethereum blockchain. |
+| [Next.js](https://www.npmjs.com/package/next)     | A framework for building fast and responsive web apps.  |
 
 ## Getting Started
 
-First, install required files:
-```bash
-npm install
-# or
-yarn install
-```
+- Clone the repository
+- Install dependencies `npm install`
+- Run `npm run dev` to start the development server
+- Open the app in a browser
 
-Then, run the development server:
+### Screenshots
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+#### 🟢 Connected
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<img src="screenshots/connected.png" alt="Connected to metamask" width="500">
 
-## Obtain Necessary Keys from Maschain
+#### Default status
 
-# Contact for problems
+<img src="screenshots/not-connected.png" alt="Default status" width="500">
 
-```bash
-Contact the team if you have any questions
-@Gravityforce04 , @0EF86
-```
+#### No Metamask
+
+<img src="screenshots/no-metamask.png" alt="User dont have metamask installed" width="500">
