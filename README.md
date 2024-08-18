@@ -1,6 +1,6 @@
 # This is the source code for JomClaim
 
-The purpose of this repsitory is the show the code for the JomClaim webpage that is deployed on Scroll Sepolia testnet.
+The purpose of this scroll-and-devcon is the show the code for the JomClaim webpage that is deployed on Scroll Sepolia testnet.
 
 This project sets up the basic required functions for applying allowance such as:
 
