@@ -1,6 +1,8 @@
 # This is the source code for JomClaim
 
-The purpose of this repsitory is the show the code for the JomClaim webpage that is deployed on MasChain using MasChain's API key. 
+# The masterchain is used for Maschain, and scroll-and-devcon branch is used for scroll + devcon source code
+
+The purpose of this master branch is the show the code for the JomClaim webpage that is deployed on MasChain using MasChain's API key. 
 
 This project sets up the basic required functions for applying allowance such as:
 
